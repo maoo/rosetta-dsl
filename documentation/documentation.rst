@@ -88,60 +88,69 @@ Rosetta defines five fundamental data types.  The set of basic types available i
 .. _record-type-label:
 
 Record Types
-""""""""""""
+-------------
+
 Rosetta defines two record types ``date`` and ``zonedDateTime``.  The set of record types available in the Rosetta DSL are controlled at the language level by the ``recordType`` definition.
 
 Record types are simplified data types:
 
 * Record types are pure data definitions and do not allow specification of validation logic in ``conditions``.
-* Record types are handled specially in the code-generators as so form part of the Rosetta DSL, rather than any Rosetta base domain model. 
+* Record types are handled specially in the code-generators as part of the Rosetta DSL, rather than any Rosetta based domain model. 
 
 Time
-""""
+-----
+
 The ``zonedDateTime`` record type unambiguously refers to a single instant of time.
 
-Alternatively in the CDM there is the data type ``BusinessCenterTime`` , where a simple ``time`` "5:00:00" is specified alongside a business center.  The simple time should be interpreted with the timezone information of the associated business center.
+Alternatively, a model could define a data type ``BusinessCenterTime``, where a simple ``time`` "5:00:00" is specified alongside a business center.  The simple time should be interpreted with the timezone information of the associated business center.
 
 Inheritance
-"""""""""""
+-------------
 
 **The Rosetta DSL supports an inheritance mechanism**, when a type inherits its definition and behaviour (and therefore all of its attributes) from another type and adds its own set of attributes on top. Inheritance is supported by the ``extends`` keyword next to the type name.
 
 .. code-block:: Haskell
 
- type Offset extends Period:
-    dayType DayTypeEnum (0..1)
+  type Vehicle extends VehicleFeature: 
+    specification Specification (1..1)
+    registrationID string (1..1)
+    vehicleTaxBand VehicleTaxBandEnum (1..1)
+    vehicleClassification VehicleClassificationEnum (1..1)
 
 .. note:: For clarity purposes, the documentation snippets omit the synonyms and definitions that are associated with the classes and attributes, unless the purpose of the snippet is to highlight some of those features.
 
 .. _enumeration-label:
 
 Enumeration
-^^^^^^^^^^^
-Purpose
-"""""""
-**Enumeration is the mechanism through which an attribute may only take some specific controlled values**. An *enumeration* is the container for the corresponding set of controlled (or enumeration) values.
+============
 
-This mimics the *scheme* concept, whose values may be specified as part of an existing standard and can be represented through an enumeration in the Rosetta DSL. Typically, a scheme with no defined values is represented as a basic ``string`` type.
+Purpose
+--------
+
+**Enumeration is the mechanism through which an attribute may only take some specific controlled values**. An enumeration is the container for the corresponding set of controlled (or enumeration) values.
+
+This mimics the "scheme" concept, whose values may be specified as part of an existing standard and can be represented through an enumeration in the Rosetta DSL. Typically, a scheme with no defined values is represented as a basic ``string`` type.
 
 Syntax
-""""""
+-------
+
 Enumerations are very simple modelling containers, which are defined in the same way as other model components. The definition of an enumeration starts with the ``enum`` keyword, followed by the enumeration name. A colon ``:`` punctuation introduces the rest of the definition, which contains a plain-text description of the enumeration and the list of enumeration values.
 
 .. code-block:: Haskell
 
- enum PeriodEnum: <"The enumerated values to specify the period, e.g. day, week.">
-   D <"Day">
-   W <"Week">
-   M <"Month">
-   Y <"Year">
+ enum EngineTypeEnum: <"Type of the engine used as an additional technical specification for a vehicle">
+    Diesel <"Diesel engine type">
+    Petrol <"Petrol engine type">
+    Electric <"Electric engine type">
+    Hybrid <"Hybrid engine type">
+    LPG <"Liquefied petroleum gas engine type">
 
-Enumeration names must be unique across a `namespace <#namespace-label>`_. The Rosetta DSL naming convention is the same as for types and must use the upper CamelCase (PascalCase).  In addition the enumeration name should end with the suffix Enum. 
+Enumeration names must be unique across a `namespace <#namespace-label>`_. The Rosetta DSL naming convention is the same as for types and must use the upper CamelCase (PascalCase).  In addition, the enumeration name should end with the suffix Enum. 
 The Enumeration values cannot start with a numerical digit, and the only special character that can be associated with them is the underscore ``_``.
 
 In order to handle the integration of scheme values which can have special characters, the Rosetta DSL allows to associate a **display name** to any enumeration value. For those enumeration values, special characters are replaced with ``_`` while the ``displayName`` entry corresponds to the actual value.
 
-An example is the day count fraction scheme for interest rate calculation, which includes values such as ``ACT/365.FIXED`` and ``30/360``. These are associated as ``displayName`` to the ``ACT_365_FIXED`` and ``_30_360`` enumeration values, respectively.
+An example is the day count fraction scheme for interest rate calculation available in the ISDA CDM, which includes values such as ``ACT/365.FIXED`` and ``30/360``. These are associated as ``displayName`` to the ``ACT_365_FIXED`` and ``_30_360`` enumeration values, respectively.
 
 .. code-block:: Haskell
 
@@ -162,9 +171,11 @@ An example is the day count fraction scheme for interest rate calculation, which
 .. _namespace-label:
 
 Namespace Component
--------------------
+===================
+
 Purpose
-"""""""
+--------
+
 The namespace syntax allows model artifacts in a data model to be organised into groups of namespaces. A namespace is an abstract container created to hold a logical grouping of model artifacts. The approach is designed to make it easier for users to understand the model structure and adopt selected components. It also aids the development cycle by insulating groups of components from model restructuring that may occur.  Model artifacts are organised into a directory structure that follows the namespaces’ Group and Artifact structure (a.k.a. “GAV coordinates”). This directory structure is exposed in the model editor.
 
 By convention namespaces are organised into a hierarchy, with layers going from in to out. The hierarchy therefore contains an intrinsic inheritance structure where each layer has access to (“imports”) the layer outside, and is designed to be usable without any of its inner layers. Layers can contain several namespaces (“siblings”), which can also refer to each other. 
