@@ -48,9 +48,9 @@ Only default code generators are provided as part of the Rosetta DSL repository.
 The Rosetta SDK
 ---------------
 
-In order to use the Rosetta DSL that is open-source, a complete *Software Development Kit (SDK)* named `Rosetta Core <https://ui.rosetta-technology.io/>`_ has been provided to the community (currently in *beta*). Much like how software engineers use programming languages and tools to create software, it is useful to think of Rosetta Core as a set of tools to use when creating and editing a domain model.
+In order to use the Rosetta DSL that is open-source, a complete Software Development Kit (SDK or dev kit) named `Rosetta <https://ui.rosetta-technology.io/>`_ has been provided to the community. Much like how software engineers use programming languages and tools to create software, it consists of an integrated set of modelling tools for using and developing models using the Rosetta DSL.
 
-Rosetta Core provides a complete adoption tool-kit for the DSL and the CDM, allowing firms to convert data into CDM objects, edit and test the model to develop their own implementations, and contribute back to the CDM project.
+Rosetta provides a complete adoption tool-kit for the DSL and a specific model, allowing firms to convert data into model objects, edit and test the model to develop their own implementations, and contribute back to the model.
 
 
 .. |Codefresh build status| image:: https://g.codefresh.io/api/badges/pipeline/regnosysops/REGnosys%2Frosetta-dsl%2Frosetta-dsl?branch=master&key=eyJhbGciOiJIUzI1NiJ9.NWE1N2EyYTlmM2JiOTMwMDAxNDRiODMz.ZDeqVUhB-oMlbZGj4tfEiOg0cy6azXaBvoxoeidyL0g&type=cf-1
