@@ -150,23 +150,15 @@ The Enumeration values cannot start with a numerical digit, and the only special
 
 In order to handle the integration of scheme values which can have special characters, the Rosetta DSL allows to associate a **display name** to any enumeration value. For those enumeration values, special characters are replaced with ``_`` while the ``displayName`` entry corresponds to the actual value.
 
-An example is the day count fraction scheme for interest rate calculation available in the ISDA CDM, which includes values such as ``ACT/365.FIXED`` and ``30/360``. These are associated as ``displayName`` to the ``ACT_365_FIXED`` and ``_30_360`` enumeration values, respectively.
+An example is the unit used to report vehicle metrics for EU emission standards in the Demonstration Model, which includes values such as ``g/km`` and ``g/kWh``. These are associated as ``displayName`` to the ``g_km`` and ``g_kWh`` enumeration values, respectively.
 
 .. code-block:: Haskell
 
- enum DayCountFractionEnum:
-   ACT_360 displayName "ACT/360"
-   ACT_365L displayName "ACT/365L"
-   ACT_365_FIXED displayName "ACT/365.FIXED"
-   ACT_ACT_AFB displayName "ACT/ACT.AFB"
-   ACT_ACT_ICMA displayName "ACT/ACT.ICMA"
-   ACT_ACT_ISDA displayName "ACT/ACT.ISDA"
-   ACT_ACT_ISMA displayName "ACT/ACT.ISMA"
-   BUS_252 displayName "BUS/252"
-   _1_1 displayName "1/1"
-   _30E_360 displayName "30E/360"
-   _30E_360_ISDA displayName "30E/360.ISDA"
-   _30_360 displayName "30/360"
+  enum UnitEnum:
+    g_km displayName "g/km"
+    _km displayName "/km"
+    g_kWh displayName "g/kWh"
+    ppm
 
 .. _namespace-label:
 
