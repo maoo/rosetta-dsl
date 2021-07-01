@@ -173,47 +173,45 @@ The namespace syntax allows model artifacts in a data model to be organised into
 By convention namespaces are organised into a hierarchy, with layers going from in to out. The hierarchy therefore contains an intrinsic inheritance structure where each layer has access to (“imports”) the layer outside, and is designed to be usable without any of its inner layers. Layers can contain several namespaces (“siblings”), which can also refer to each other. 
 
 Syntax
-"""""""
+-------
 
-The definition of a namespace starts with the `namespace` keyword, followed by the location of the namespace in the directory structure. ::
+The definition of a namespace starts with the ``namespace`` keyword, followed by the location of the namespace in the directory structure. ::
 
-  namespace cdm.product.common
+  namespace demo.types
 
-The names of all components must be unique within a given namespace. Components can refer to other components in the same namespace using just their name. Components can refer to components outside their namespace either by giving the *fully qualified name* e.g. ``cdm.base.datetime.AdjustableDate`` or by importing the namespace into the current file.
+The names of all components must be unique within a given namespace. Components can refer to other components in the same namespace using just their name. Components can refer to components outside their namespace either by giving the fully qualified name e.g. ``demo.types`` or by importing the namespace into the current file.
 
-To gain access to model components contained within another namespace the `import` keyword is used. ::
+To gain access to model components contained within another namespace the ``import`` keyword is used. ::
 
-  import cdm.product.asset.*
+  import demo.types.*
 
-In the example above all model components contained within the cdm.product.asset namespace will be imported. Note, only components contained within the layer referenced will be imported, in order to import model components from namespaces embedded within that layer further namespaces need to be individually referenced. ::
+In the example above all model components contained within the demo.types namespace will be imported. Note, only components contained within the layer referenced will be imported. That is, in order to import model components from namespaces embedded within that layer further namespaces need to be individually referenced. ::
 
-  import cdm.base.math.*
-  import cdm.base.datetime.*
-  import cdm.base.staticdata.party.*
-  import cdm.base.staticdata.asset.common.*
-  import cdm.base.staticdata.asset.rates.*
-  import cdm.base.staticdata.asset.credit.*
-
-In the example above all model components contained within the layers of the `cdm.base` namespace are imported.
+  import demo.enumeration.*
+  import demo.functions*
 
 .. _annotations-label:
 
 Annotation Component
---------------------
+=====================
+
 Annotation Definition
-^^^^^^^^^^^^^^^^^^^^^
+---------------------
+
 Purpose
 """""""
+
 Annotations allow to associate meta-information to model components, which can serve a number of purposes:
 
-* purely syntactic, to provide additional guidance when navigating model components
-* to add constraints to a model that may be enforced by syntax validation
-* to modify the actual behaviour of a model in generated code
+* to provide additional guidance when navigating model components from a purely syntactic perspective.
+* to add constraints to a model that may be enforced by syntax validation.
+* to modify the actual behaviour of a model in generated code.
 
 Examples of annotations and their usage for different purposes are illustrated below.
 
 Syntax
-""""""
+"""""""
+
 Annotations are defined in the same way as other model components. The definition of an annotation starts with the ``annotation`` keyword, followed by the annotation name. A colon ``:`` punctuation introduces the rest of the definition, starting with a plain-text description of the annotation.
 
 Annotation names must be unique across a model. The Rosetta DSL naming convention is to use a (lower) camelCase.
@@ -227,15 +225,17 @@ It is possible to associate attributes to an annotation (see `metadata <#metadat
 
  annotation deprecated: <"Marks a type, function or enum as deprecated and will be removed/replaced.">
 
-An annotation can be added to a Rosetta Type or attribute by enclosing the name of the annotation in sqaure bracketss 
+An annotation can be added to a Rosetta Type or attribute by enclosing the name of the annotation in square brackets ``[ ]`` 
 
 Meta-Data and Reference
-^^^^^^^^^^^^^^^^^^^^^^^
+-----------------------
+
 Purpose
 """""""
+
 .. _metadata-label:
 
-The ``metadata`` annotation allows the declaration of a set of meta-data qualifiers that can be applied to types and attributes. By default Rosetta includes several metadata annotations 
+The ``metadata`` annotation allows the declaration of a set of meta-data qualifiers that can be applied to types and attributes. By default, Rosetta includes several metadata annotations:
 
 .. code-block:: Haskell
 
@@ -245,8 +245,8 @@ The ``metadata`` annotation allows the declaration of a set of meta-data qualifi
    scheme string (0..1)
    reference string (0..1)
    template string (0..1)
-	 location string (0..1) <"Specifies this is the target of an internal reference">
-	 address string (0..1) <"Specified that this is an internal reference to an object that appears elsewhere">
+   location string (0..1) <"Specifies this is the target of an internal reference">
+   address string (0..1) <"Specified that this is an internal reference to an object that appears elsewhere">
 
 Each attribute of the ``metadata`` annotation corresponds to a qualifier that can be applied to a rosetta type or attribute:
 
