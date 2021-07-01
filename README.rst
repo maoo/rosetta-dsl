@@ -35,7 +35,8 @@ The modelling components available in the Rosetta DSL syntax are detailed in the
 * create new model from scratch
 * edit or extend existing models
 
-The syntax is used in several existing models, including the ISDA Commond Domain Model (or ISDA CDM - see the section on `The ISDA CDM`_). Each model is hosted separately from the Rosetta DSL in its own repository, that could be either public or private.
+The syntax is used in several existing models. The ISDA Commond Domain Model (or ISDA CDM - see the section on `The ISDA CDM`_) is one of them, but also a Demonstration Model which aims to guide new users how to use the Rosetta DSL and the Rosetta Platform. 
+Each model is hosted separately from the Rosetta DSL in its own repository, that could be either public or private.
 
 Code Generators
 ^^^^^^^^^^^^^^^
@@ -43,13 +44,6 @@ Code Generators
 Code generators are key to remove the need for technologists to translate the model specifications into actual code. To make the model technology platform-agnostic while ensuring inter-operability of different implementations, these code generators are also open source.
 
 Only default code generators are provided as part of the Rosetta DSL repository. A separate `Code Generators repository <https://github.com/REGnosys/rosetta-code-generators>`__ allows the community to create and make available code generators in potentially any software language. The `Code Generator documentation <https://docs.rosetta-technology.io/dsl/codegen-readme.html>`_ details the code generation mechanism and how to write and test one.
-
-The ISDA CDM
-^^^^^^^^^^^^
-
-The `ISDA Common Domain Model <https://docs.rosetta-technology.io/cdm/index.html>`_ is the first live application of the Rosetta DSL, to the derivative's transaction lifecycle. It is openly accessible through `Rosetta Core <https://ui.rosetta-technology.io>`_ or the `CDM Portal <https://portal.cdm.rosetta-technology.io>`_, subject to the ISDA CDM licence.
-
-For more details, please consult the `ISDA CDM documentation <https://docs.rosetta-technology.io/cdm/index.html>`_ or contact ISDA directly at marketinfrastructureandtechnology@isda.org
 
 The Rosetta SDK
 ---------------
