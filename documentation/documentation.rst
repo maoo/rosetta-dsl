@@ -1,6 +1,6 @@
-****************************
+############################
 Rosetta Modelling Components
-****************************
+############################
 
 **The Rosetta syntax can express seven types of model components**:
 
