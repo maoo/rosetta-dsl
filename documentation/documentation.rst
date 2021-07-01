@@ -70,11 +70,13 @@ Then the definition of the type lists its component attributes. Each attribute i
 .. note:: The Rosetta DSL does not use any delimiter to end definitions. All model definitions start with a similar opening keyword as ``type``, so the start of a new definition marks the end of the previous one. For readability more generally, the Rosetta DSL looks to eliminate all the delimiters that are often used in traditional programming languages (such as curly braces ``{`` ``}`` or semi-colon ``;``).
 
 Built in types
-^^^^^^^^^^^^^^
+===============
+
 .. _basic-type-label:
 
 Basic Types
-"""""""""""
+------------
+
 Rosetta defines five fundamental data types.  The set of basic types available in the Rosetta DSL are controlled at the language level by the ``basicType`` definition:
 
  * ``string`` - Text
