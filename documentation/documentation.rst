@@ -1,19 +1,22 @@
+****************************
 Rosetta Modelling Components
-============================
+****************************
+
 **The Rosetta syntax can express seven types of model components**:
 
 * Data
 * Annotation
-* Data Validation (or *condition*)
+* Data Validation (or "condition")
 * Function
-* Mapping (or *synonym*)
+* Mapping (or "synonym")
 * Reporting
 * Namespace
 
-This documentation details the purpose and features of each type of model component and highlights the relationships that exist among those. As the initial live application of the Rosetta DSL, examples from the ISDA CDM will be used to illustrate each of those features.
+This documentation details the purpose and features of each type of model component and highlights the relationships that exist among those. Examples from the Demonstration Model will be used to illustrate each of those features.
 
 Data Component
---------------
+***************
+
 **The Rosetta DSL provides two data definition components** that are used to model data:
 
 * `Type <#type-label>`_
@@ -22,16 +25,19 @@ Data Component
 .. _type-label:
 
 Type
-^^^^
+=====
+
 Purpose
-"""""""
-A *type* describes an *entity* (also sometimes referred to as an *object* or a *class*) in the model and is defined by a plain-text description and a set of *attributes* (also sometimes refered to as fields). Attributes specify the granular elements composing the entity.
+-------
+
+A **type** describes an entity (also sometimes referred to as an "object" or a "class") in the model and is defined by a plain-text description and a set of **attributes** (also sometimes refered to as "fields"). Attributes specify the granular elements composing of the entity.
 
 Syntax
-""""""
+-------
+
 The definition of a type starts with the keyword ``type``, followed by the type name. A colon ``:`` punctuation introduces the rest of the definition.
 
-The Rosetta DSL convention is that type names use the *PascalCase* (starting with a capital letter, also referred to as the *upper* `CamelCase`_). Type names need to be unique across a `namespace <#namespace-label>`_. All those requirements are controlled by the Rosetta DSL grammar.
+The Rosetta DSL convention is that type names use the PascalCase (starting with a capital letter, also referred to as the "upper" `CamelCase`_). Type names need to be unique across a `namespace <#namespace-label>`_. All those requirements are controlled by the Rosetta DSL grammar.
 
 The first component of the definition is a plain-text description of the type. Descriptions use quotation marks ``"`` ``"`` (to mark a string) in between angle brackets ``<`` ``>``. Descriptions, although not generating any executable code, are integral meta-data components of the model. As modelling best practice, a definition ought to exist for every artefact and be clear and comprehensive.
 
@@ -39,30 +45,27 @@ After the description come any `annotations <#annotations-label>`_ that are appl
 
 .. code-block:: Haskell
  
-  type WorkflowStep: <"A workflow step ....">
-	[metadata key]
+  type VehicleOwnership: <"Representative record of vehicle ownership">
 	[rootType]
 
 Then the definition of the type lists its component attributes. Each attribute is defined by three required components, and two optional components, syntactically ordered as:
 
 * name - 
-  Required - Attribute names use the *camelCase* (starting with a lower case letter, also referred to as the *lower* camelCase).
+  Required - Attribute names use the *camelCase* (starting with a lower case letter, also referred to as the "lower" camelCase).
 * type - 
   Required - Each attribute can be specified either as a `basic type <#basic-type-label>`_, `record type <#record-type-label>`_, data type or `enumeration type <#enumeration-label>`_.
 * cardinality -  
   Required - see `Cardinality <#cardinality-label>`_
-* description - Optional but recommended) - A description of the attribute using the sames <"..."> syntax as the type description
+* description - Optional (but recommended) - A description of the attribute using the sames <"..."> syntax as the type description
 * annotations - Optional - Annotations such as `synonyms <mapping.html>`_ or metadata can be applied to attributes
 
 .. code-block:: Haskell
 
-  type PeriodBound: <"The period bound is defined as a period and whether the bound is inclusive.">
-    period Period (1..1) <"The period to be used as the bound, e.g. 5Y.">
-    inclusive boolean (1..1) <"Whether the period bound is inclusive, e.g. for a lower bound, false would indicate greater than, whereas true would indicate greater than or equal to.">
-
- type Period: <"A class to define recurring periods or time offsets.">
-   periodMultiplier int (1..1) <"A time period multiplier, e.g. 1, 2 or 3 etc. A negative value can be used when specifying an offset relative to another date, e.g. -2 days.">
-   period PeriodEnum (1..1) <"A time period, e.g. a day, week, month or year of the stream. If the periodMultiplier value is 0 (zero) then period must contain the value D (day).">
+  type Engine: <"Description of the engine.">
+    engineType EngineTypeEnum (1..1) <"Type of engine.">
+    power number (1..1) <"Break horse power.">
+    mpg number (1..1) <"Miles per gallon.">
+    emissionMetrics EmissionMetrics (1..1) <"List of emission metrics in grams per km.">
 
 .. note:: The Rosetta DSL does not use any delimiter to end definitions. All model definitions start with a similar opening keyword as ``type``, so the start of a new definition marks the end of the previous one. For readability more generally, the Rosetta DSL looks to eliminate all the delimiters that are often used in traditional programming languages (such as curly braces ``{`` ``}`` or semi-colon ``;``).
 
