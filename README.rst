@@ -1,5 +1,6 @@
+***************************
 Overview of the Rosetta DSL
-===========================
+***************************
 
 .. role:: raw-html(raw)
     :format: html
@@ -8,9 +9,9 @@ Overview of the Rosetta DSL
 **License:** `Apache 2.0 <http://www.apache.org/licenses/LICENSE-2.0>`_
 
 What is the Rosetta DSL
------------------------
+***********************
 
-*Rosetta* is a Domain-Specific Language (DSL) designed for the financial industry, which purpose is to consolidate market standards and operational practices into a cohesive *domain model* (or simply *model*). In software engineering, a `domain model <https://en.wikipedia.org/wiki/Domain_model>`_ is a conceptual model of the domain that incorporates both *data* and *behaviour* (i.e. rules and processes).
+**Rosetta DSL** is a Domain-Specific Language (DSL) designed for the financial industry, which purpose is to consolidate market standards and operational practices into a cohesive **domain model** (or simply model). In software engineering, a `domain model <https://en.wikipedia.org/wiki/Domain_model>`_ is a conceptual model of the domain that incorporates both data and behaviour (i.e. rules and processes).
 
 The key idea behind the Rosetta DSL is that financial markets presently have two unappealing characteristics in support of electronic data representation:
 
@@ -20,15 +21,15 @@ The key idea behind the Rosetta DSL is that financial markets presently have two
 **The Rosetta DSL addresses those shortcomings by enabling the consolidation** of various data and workflow representations into a cohesive model (hence the naming reference to the Rosetta Stone). The model is automatically translated into executable code using code generators and can directly be used as part of an implementation stack.
 
 Rosetta DSL Components
-----------------------
+***********************
 
 The open-source Rosetta DSL repository comprises 2 components:
 
-- **Syntax**, also known as a *grammar*
+- **Syntax**, also known as a grammar
 - **Code Generators**, provided by default for `Java <https://www.oracle.com/java/>`_
 
 Syntax
-^^^^^^
+=======
 
 The modelling components available in the Rosetta DSL syntax are detailed in the `Rosetta Modelling Components <https://docs.rosetta-technology.io/dsl/documentation.html>`_ section of the documentation. Those components can be used to either:
 
@@ -39,14 +40,14 @@ The syntax is used in several existing models. The ISDA Commond Domain Model (or
 Each model is hosted separately from the Rosetta DSL in its own repository, that could be either public or private.
 
 Code Generators
-^^^^^^^^^^^^^^^
+================
 
 Code generators are key to remove the need for technologists to translate the model specifications into actual code. To make the model technology platform-agnostic while ensuring inter-operability of different implementations, these code generators are also open source.
 
 Only default code generators are provided as part of the Rosetta DSL repository. A separate `Code Generators repository <https://github.com/REGnosys/rosetta-code-generators>`__ allows the community to create and make available code generators in potentially any software language. The `Code Generator documentation <https://docs.rosetta-technology.io/dsl/codegen-readme.html>`_ details the code generation mechanism and how to write and test one.
 
 The Rosetta SDK
----------------
+****************
 
 In order to use the Rosetta DSL that is open-source, a complete Software Development Kit (SDK or dev kit) named `Rosetta <https://ui.rosetta-technology.io/>`_ has been provided to the community. Much like how software engineers use programming languages and tools to create software, it consists of an integrated set of modelling tools for using and developing models using the Rosetta DSL.
 
