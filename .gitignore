@@ -17,4 +17,3 @@ build.acceleo
 **/src/generated/
 
 .antlr-generator-3.2.0-patch.jar
-com.regnosys.rosetta.web/
