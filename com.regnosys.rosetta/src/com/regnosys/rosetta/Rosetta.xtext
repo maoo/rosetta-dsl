@@ -407,7 +407,11 @@ RosettaSegment:
 
 RosettaCallableCall: 
 	callable=[RosettaCallable|QualifiedName]
-	| implicitReceiver ?= 'item'
+	| implicitReceiver = ImplicitReceiver
+;
+
+enum ImplicitReceiver:
+	item | itemIndex
 ;
 
 RosettaLiteral:

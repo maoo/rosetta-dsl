@@ -241,8 +241,14 @@ abstract class RosettaExpression {
 
 class RosettaCallableCall extends RosettaExpression {
 	boolean onlyElement
-	boolean implicitReceiver
+	ImplicitReceiver implicitReceiver
 	refers RosettaCallable callable
+}
+
+enum ImplicitReceiver {
+	not_set
+	item as 'item',
+	itemIndex as 'item-index'
 }
 
 class RosettaEnumValueReference extends RosettaExpression {

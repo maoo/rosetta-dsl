@@ -3843,6 +3843,23 @@ class ListOperationTest {
 		assertEquals(ImmutableList.of(foo1, foo3, foo2, foo4), res);
 	}
 	
+	@Test
+	def void shouldGenerateFilterWithIndex() {
+		val model = '''
+			func GetThirdDate:  
+			    inputs: 
+			        dates date (0..*) 
+			    output: 
+			        thirdDate date (0..1) 
+			
+			    set thirdDate: 
+			        dates sort 
+			            filter [ item-index = 3] // filter to the 3rd item of the list 
+			            only-element
+		'''
+		assertFalse(model.generateCode.empty)
+	}
+	
 	private def RosettaModelObject createFoo(Map<String, Class<?>> classes, String attr) {
 		classes.createInstanceUsingBuilder('Foo', of('attr', attr), of()) as RosettaModelObject
 	}

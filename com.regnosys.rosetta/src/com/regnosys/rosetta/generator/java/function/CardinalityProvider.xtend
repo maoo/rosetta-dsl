@@ -29,6 +29,7 @@ import com.regnosys.rosetta.rosetta.simple.ListOperation
 import com.regnosys.rosetta.rosetta.simple.ShortcutDeclaration
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.EcoreUtil2
+import com.regnosys.rosetta.rosetta.ImplicitReceiver
 
 class CardinalityProvider {
 	
@@ -50,12 +51,18 @@ class CardinalityProvider {
 			RosettaEnumValue:false
 			WithCardinality: if(obj.card === null) false else obj.card.isIsMany
 			RosettaCallableCall: {
-				if(obj.onlyElement) 
+				if(obj.onlyElement) {
 					false 
-				else if (obj.implicitReceiver) 
+				}
+				else if (obj.implicitReceiver === ImplicitReceiver.ITEM) {
 					EcoreUtil2.getContainerOfType(obj, ListOperation).firstOrImplicit.isMulti(breakOnClosureParameter)
-				else 
+				}
+				else if (obj.implicitReceiver === ImplicitReceiver.ITEM_INDEX) {
+					false
+				}
+				else {
 					obj.callable.isMulti(breakOnClosureParameter)
+				}
 			}
 			RosettaCallableWithArgsCall: {
 				if(obj.onlyElement) 

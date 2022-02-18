@@ -9,6 +9,7 @@ import com.regnosys.rosetta.generator.java.util.JavaType
 import com.regnosys.rosetta.generator.util.RosettaAttributeExtensions
 import com.regnosys.rosetta.generator.util.RosettaFunctionExtensions
 import com.regnosys.rosetta.generator.util.Util
+import com.regnosys.rosetta.rosetta.ImplicitReceiver
 import com.regnosys.rosetta.rosetta.RosettaAbsentExpression
 import com.regnosys.rosetta.rosetta.RosettaBigDecimalLiteral
 import com.regnosys.rosetta.rosetta.RosettaBinaryOperation
@@ -283,9 +284,10 @@ class ExpressionGenerator {
 	}
 	
 	protected def StringConcatenationClient callableCall(RosettaCallableCall expr, ParamMap params) {
-		if (expr.implicitReceiver) {
+		if (expr.implicitReceiver === ImplicitReceiver.ITEM) {
 			return '''«EcoreUtil2.getContainerOfType(expr, ListOperation).firstOrImplicit.getNameOrDefault.toDecoratedName»'''
 		}
+		// TODO translate ImplicitReciever.ITEM_INDEX
 		val call = expr.callable
 		switch (call)  {
 			Data : {

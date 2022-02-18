@@ -2,6 +2,7 @@ package com.regnosys.rosetta.types
 
 import com.google.inject.Inject
 import com.regnosys.rosetta.RosettaExtensions
+import com.regnosys.rosetta.rosetta.ImplicitReceiver
 import com.regnosys.rosetta.rosetta.RosettaAbsentExpression
 import com.regnosys.rosetta.rosetta.RosettaBasicType
 import com.regnosys.rosetta.rosetta.RosettaBigDecimalLiteral
@@ -76,10 +77,13 @@ class RosettaTypeProvider {
 		}
 		switch expression {
 			RosettaCallableCall: {
-				if(expression.implicitReceiver)
+				if(expression.implicitReceiver === ImplicitReceiver.ITEM) {
 					safeRType(EcoreUtil2.getContainerOfType(expression, ListOperation).firstOrImplicit, cycleTracker)
-				else
+				} else if(expression.implicitReceiver === ImplicitReceiver.ITEM_INDEX) {
+					RBuiltinType.INT
+				} else {
 					safeRType(expression.callable, cycleTracker)
+				}
 			}
 			RosettaCallableWithArgsCall: {
 				if (expression.callable instanceof RosettaExternalFunction) {
