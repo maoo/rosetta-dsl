@@ -347,6 +347,16 @@ See the Apache License Version 2.0 for the specific language governing permissio
 	</build>
 	<repositories>
 		<repository>
+		  <id>sonatype_snapshots</id>
+		  <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+		  <releases>
+		    <enabled>false</enabled>
+		  </releases>
+		  <snapshots>
+		    <enabled>true</enabled>
+		  </snapshots>
+		</repository>
+		<repository>
 			<id>codehaus-snapshots</id>
 			<name>disable dead 'Codehaus Snapshots' repository, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=481478</name>
 			<url>http://nexus.codehaus.org/snapshots/</url>
@@ -376,6 +386,16 @@ See the Apache License Version 2.0 for the specific language governing permissio
 		</repository>
 	</repositories>
 	<pluginRepositories>
+		<pluginRepository>
+			<id>sonatype_snapshots</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+			<releases>
+				<enabled>false</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</pluginRepository>
 		<pluginRepository>
 			<id>codehaus-snapshots</id>
 			<name>disable dead 'Codehaus Snapshots' repository, see https://bugs.eclipse.org/bugs/show_bug.cgi?id=481478</name>
