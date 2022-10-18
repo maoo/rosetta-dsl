@@ -84,6 +84,10 @@ See the Apache License Version 2.0 for the specific language governing permissio
 	<build>
 		<plugins>
 			<plugin>
+				<artifactId>maven-site-plugin</artifactId>
+				<version>3.12.1</version>
+			</plugin>
+			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho-version}</version>
