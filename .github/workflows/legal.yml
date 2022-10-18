@@ -27,4 +27,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: license-reports
-        path: '**/licenses.html'
+        path: '**/dependencies.html'
