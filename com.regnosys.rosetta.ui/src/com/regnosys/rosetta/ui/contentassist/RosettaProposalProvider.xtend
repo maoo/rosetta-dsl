@@ -8,7 +8,7 @@ import com.google.common.base.Predicate
 import com.google.common.base.Predicates
 import com.google.inject.Inject
 import com.regnosys.rosetta.RosettaExtensions
-import com.regnosys.rosetta.rosetta.RosettaBinaryOperation
+import com.regnosys.rosetta.rosetta.expression.RosettaBinaryOperation
 import com.regnosys.rosetta.rosetta.RosettaModel
 import com.regnosys.rosetta.rosetta.simple.Operation
 import com.regnosys.rosetta.scoping.RosettaScopeProvider
@@ -16,7 +16,6 @@ import com.regnosys.rosetta.services.RosettaGrammarAccess
 import com.regnosys.rosetta.types.REnumType
 import com.regnosys.rosetta.types.RosettaExpectedTypeProvider
 import com.regnosys.rosetta.types.RosettaTypeProvider
-import com.regnosys.rosetta.utils.RosettaConfigExtension
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.jface.text.contentassist.ICompletionProposal
@@ -33,6 +32,7 @@ import org.eclipse.xtext.ui.editor.contentassist.ICompletionProposalAcceptor
 
 import static com.regnosys.rosetta.rosetta.RosettaPackage.Literals.*
 import static com.regnosys.rosetta.rosetta.simple.SimplePackage.Literals.*
+import static com.regnosys.rosetta.rosetta.expression.ExpressionPackage.Literals.*
 
 /**
  * See https://www.eclipse.org/Xtext/documentation/310_eclipse_support.html#content-assist
@@ -43,7 +43,6 @@ class RosettaProposalProvider extends AbstractRosettaProposalProvider {
 	@Inject extension RosettaTypeProvider
 	@Inject extension RosettaExpectedTypeProvider
 	@Inject extension RosettaExtensions
-	@Inject extension RosettaConfigExtension
 	
 	@Inject IQualifiedNameProvider qNames
 	@Inject RosettaGrammarAccess grammar

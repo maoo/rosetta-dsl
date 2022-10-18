@@ -4,22 +4,29 @@
 package com.regnosys.rosetta
 
 import com.google.inject.Provider
+import com.regnosys.rosetta.derivedstate.RosettaDerivedStateComputer
 import com.regnosys.rosetta.generator.RosettaOutputConfigurationProvider
 import com.regnosys.rosetta.generator.external.EmptyExternalGeneratorsProvider
 import com.regnosys.rosetta.generator.external.ExternalGenerators
+import com.regnosys.rosetta.generator.resourcefsa.ResourceAwareFSAFactory
+import com.regnosys.rosetta.generator.resourcefsa.TestResourceAwareFSAFactory
 import com.regnosys.rosetta.resource.RosettaFragmentProvider
 import com.regnosys.rosetta.resource.RosettaResourceDescriptionManager
 import com.regnosys.rosetta.resource.RosettaResourceDescriptionStrategy
 import com.regnosys.rosetta.scoping.RosettaQualifiedNameProvider
+import com.regnosys.rosetta.serialization.IgnoreDerivedStateSerializer
 import org.eclipse.xtext.generator.IOutputConfigurationProvider
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.resource.DerivedStateAwareResource
+import org.eclipse.xtext.resource.IDerivedStateComputer
 import org.eclipse.xtext.resource.IFragmentProvider
 import org.eclipse.xtext.resource.IResourceDescription
+import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.impl.DefaultResourceDescriptionStrategy
-import com.regnosys.rosetta.generator.resourcefsa.ResourceAwareFSAFactory
-import com.regnosys.rosetta.generator.resourcefsa.TestResourceAwareFSAFactory
-import com.regnosys.rosetta.types.TypeFactory
-import com.regnosys.rosetta.types.TypeValidationUtil
+import org.eclipse.xtext.serializer.ISerializer
+import org.eclipse.xtext.parser.IEncodingProvider
+import com.google.inject.Binder
+import org.eclipse.xtext.service.DispatchingProvider
 
 /* Use this class to register components to be used at runtime / without the Equinox extension registry.*/
 class RosettaRuntimeModule extends AbstractRosettaRuntimeModule {
@@ -50,5 +57,23 @@ class RosettaRuntimeModule extends AbstractRosettaRuntimeModule {
 	
 	def Class<? extends Provider<ExternalGenerators>> provideExternalGenerators() {
 		EmptyExternalGeneratorsProvider
+	}
+	
+	override Class<? extends ISerializer> bindISerializer() {
+		IgnoreDerivedStateSerializer
+	}
+	
+    override void configureRuntimeEncodingProvider(Binder binder) {
+        binder.bind(IEncodingProvider)
+        	.annotatedWith(DispatchingProvider.Runtime)
+        	.to(UTF8EncodingProvider);
+    }
+	
+	// Setup derived state
+	override Class<? extends XtextResource> bindXtextResource() {
+		return DerivedStateAwareResource;
+	}
+	def Class<? extends IDerivedStateComputer> bindIDerivedStateComputer() {
+		RosettaDerivedStateComputer
 	}
 }
