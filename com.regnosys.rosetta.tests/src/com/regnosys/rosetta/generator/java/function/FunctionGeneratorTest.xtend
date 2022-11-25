@@ -22,6 +22,7 @@ import static com.regnosys.rosetta.rosetta.expression.ExpressionPackage.Literals
 import static org.hamcrest.MatcherAssert.assertThat
 import static org.hamcrest.core.IsCollectionContaining.hasItems
 import static org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Disabled
 import java.time.ZonedDateTime
 import java.time.ZoneId
 
@@ -33,6 +34,233 @@ class FunctionGeneratorTest {
 	@Inject extension CodeGeneratorTestHelper
 	@Inject extension ModelHelper
 	@Inject extension ValidationTestHelper
+	
+	@Test
+	def void namedFunctionInFunctionalOperationTest() {
+		val code = '''
+			namespace com.rosetta.test.model
+			version "${project.version}"
+			
+			func Incr:
+				inputs:
+					a int (1..1)
+				output:
+					result int (1..1)
+				
+				set result:
+					a + 1
+			
+			func IsAnswerToTheUniverse:
+				inputs:
+					a int (1..1)
+				output:
+					result boolean (1..1)
+				
+				set result:
+					a = 42
+			
+			func ClosestToTen:
+				inputs:
+					a int (1..1)
+					b int (1..1)
+				output:
+					result int (1..1)
+				
+				set result:
+					if a < 10 then
+						if b < 10 then
+							if a > b then a else b
+						else
+							if 10 - a < b - 10 then a else b
+					else
+						if b < 10 then
+							if a - 10 < 10 - b then a else b
+						else
+							if a < b then a else b
+			
+			func F1:
+				inputs:
+					list int (0..*)
+				output:
+					res int (0..*)
+				
+				add res:
+					list
+						extract Incr
+			
+			func F2:
+				inputs:
+					list int (0..*)
+				output:
+					res boolean (0..*)
+				
+				add res:
+					list
+						extract IsLeapYear
+			
+			func F3:
+				inputs:
+					list int (0..*)
+				output:
+					res int (0..*)
+				
+				add res:
+					list
+						filter IsAnswerToTheUniverse
+			
+			func F4:
+				inputs:
+					list int (0..*)
+				output:
+					res int (1..1)
+				
+				set res:
+					list
+						reduce ClosestToTen
+			
+			func F5:
+				inputs:
+					list int (0..*)
+				output:
+					res int (0..*)
+				
+				add res:
+					list
+						extract Incr
+						extract Incr
+						extract [ item + 1 ]
+						extract-all a [ a extract Incr ]
+		'''.generateCode
+		val classes = code.compileToClasses
+
+		val func1 = classes.createFunc("F1");
+		assertEquals(#[2, 3, 4], func1.invokeFunc(List, #[#[1, 2, 3]]))
+		
+		val func2 = classes.createFunc("F2");
+		assertEquals(#[true, false, false], func2.invokeFunc(List, #[#[2000, 2001, 2002]]))
+		
+		val func3 = classes.createFunc("F3");
+		assertEquals(#[42, 42], func3.invokeFunc(List, #[#[1, 2, 42, 3, 42]]))
+		
+		val func4 = classes.createFunc("F4");
+		assertEquals(8, func4.invokeFunc(Integer, #[#[0, 5, 8]]))
+		assertEquals(11, func4.invokeFunc(Integer, #[#[0, 5, 8, 11, 15]]))
+		
+		val func5 = classes.createFunc("F5");
+		assertEquals(#[5, 6, 7], func5.invokeFunc(List, #[#[1, 2, 3]]))
+	}
+	
+	@Test
+	def void emptyArgumentTest() {
+		val code = '''
+			namespace com.rosetta.test.model
+			version "${project.version}"
+			
+			func F1:
+				output:
+					res int (1..1)
+				set res:
+					F2(empty)
+			
+			func F2:
+				inputs:
+					a int (0..1)
+				output:
+					res int (1..1)
+				set res:
+					42
+		'''.generateCode
+		code.compileToClasses
+	}
+	
+	@Test
+	def void extractAllTest() {
+		val code = '''
+			namespace com.rosetta.test.model
+			version "${project.version}"
+			
+			func F1:
+				output:
+					res boolean (1..1)
+				set res:
+					empty extract-all [item = empty]
+			
+			func F2:
+				output:
+					res int (1..1)
+				set res:
+					42 extract-all [item + item]
+			
+			func F3:
+				output:
+					res int (2..2)
+				set res:
+					[1, 2, 3] extract-all [ [item count, item sum] ]
+			
+			func F4:
+				output:
+					res int (2..2)
+				set res:
+					[1, 2, 3]
+						extract [ [item, item] ]
+						extract-all [ item extract l [ l count ] ]
+			
+			func F5:
+				output:
+					res int (2..2)
+				set res:
+					[1, 2, 3]
+						extract [ [item, item] ]
+						extract-all [ item extract l [ [ l count, l sum ] ] ]
+						extract-all [ item extract l [ l sum ] ]
+		'''.generateCode
+		val classes = code.compileToClasses
+
+		val func1 = classes.createFunc("F1");
+		assertFalse(func1.invokeFunc(Boolean))
+
+		val func2 = classes.createFunc("F2");
+		assertEquals(84, func2.invokeFunc(Integer))
+
+		val func3 = classes.createFunc("F3");
+		assertEquals(#[3, 6], func3.invokeFunc(List))
+
+		val func4 = classes.createFunc("F4");
+		assertEquals(#[2, 2, 2], func4.invokeFunc(List))
+
+		val func5 = classes.createFunc("F5");
+		assertEquals(#[4, 6, 8], func5.invokeFunc(List))
+	}
+	
+	@Test
+	def void singularExtractTest() {
+		val code = '''
+			namespace com.rosetta.test.model
+			version "${project.version}"
+			
+			func F1:
+				output:
+					res int (1..1)
+				set res:
+					42
+						extract [item + 1]
+			
+			func F2:
+				output:
+					res boolean (1..1)
+				set res:
+					42
+						extract [item + 1]
+						extract [item = 42]
+		'''.generateCode
+		val classes = code.compileToClasses
+
+		val func1 = classes.createFunc("F1");
+		assertEquals(43, func1.invokeFunc(Integer))
+		
+		val func2 = classes.createFunc("F2");
+		assertFalse(func2.invokeFunc(Boolean))
+	}
 	
 	@Test
 	def void testPreconditionValidGeneration() {
@@ -562,6 +790,7 @@ class FunctionGeneratorTest {
 		code.compileToClasses
 	}
 
+	@Disabled
 	@Test
 	def void shouldGenerateFunctionWithAssignemtnAsReference() {
 
@@ -605,6 +834,7 @@ class FunctionGeneratorTest {
 		.compileToClasses
 	}
 
+	@Disabled
 	@Test
 	def void shouldGenerateFunctionWithAssignmentAsMeta() {
 
@@ -1157,7 +1387,7 @@ class FunctionGeneratorTest {
 				then bar -> num exists
 			
 			type Bar:
-				num number (1..1)
+				num number (0..1)
 				zap Zap (1..1)
 			
 			enum Zap:
@@ -1196,8 +1426,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					s1 string (1..1)
-					s2 string (1..*)
+					s1 string (1..*)
+					s2 string (1..1)
 				output:
 					res boolean (1..1)
 				set res: s1 all = s2
@@ -1206,9 +1436,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertTrue(func.invokeFunc(Boolean, "a", Arrays.asList("a", "a")))
-		assertFalse(func.invokeFunc(Boolean, "a", Arrays.asList("a", "b")))
-		assertFalse(func.invokeFunc(Boolean, "b", Arrays.asList("a", "a")))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList("a", "a"), "a"))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList("a", "b"), "a"))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList("b", "b"), "a"))
 	}
 
 	@Test
@@ -1219,8 +1449,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					s1 string (1..1)
-					s2 string (1..*)
+					s1 string (1..*)
+					s2 string (1..1)
 				output:
 					res boolean (1..1)
 				set res: s1 any = s2
@@ -1229,9 +1459,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertTrue(func.invokeFunc(Boolean, "a", Arrays.asList("a", "a")))
-		assertTrue(func.invokeFunc(Boolean, "a", Arrays.asList("a", "b")))
-		assertFalse(func.invokeFunc(Boolean, "b", Arrays.asList("a", "a")))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList("a", "a"), "a"))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList("a", "b"), "a"))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList("b", "b"), "a"))
 	}
 
 	@Test
@@ -1242,8 +1472,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					n1 int (1..1)
-					n2 int (1..*)
+					n1 int (1..*)
+					n2 int (1..1)
 				output:
 					res boolean (1..1)
 				set res: n1 all = n2
@@ -1252,9 +1482,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertTrue(func.invokeFunc(Boolean, 1, Arrays.asList(1, 1)))
-		assertFalse(func.invokeFunc(Boolean, 1, Arrays.asList(1, 2)))
-		assertFalse(func.invokeFunc(Boolean, 2, Arrays.asList(1, 1)))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(1, 1), 1))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 2), 1))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 1), 2))
 	}
 
 	@Test
@@ -1265,8 +1495,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					n1 int (1..1)
-					n2 int (1..*)
+					n1 int (1..*)
+					n2 int (1..1)
 				output:
 					res boolean (1..1)
 				set res: n1 any = n2
@@ -1275,9 +1505,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertTrue(func.invokeFunc(Boolean, 1, Arrays.asList(1, 1)))
-		assertTrue(func.invokeFunc(Boolean, 1, Arrays.asList(1, 2)))
-		assertFalse(func.invokeFunc(Boolean, 2, Arrays.asList(1, 1)))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(1, 1), 1))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(1, 2), 1))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 1), 2))
 	}
 	
 	@Test
@@ -1319,8 +1549,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					s1 string (1..1)
-					s2 string (1..*)
+					s1 string (1..*)
+					s2 string (1..1)
 				output:
 					res boolean (1..1)
 				set res: s1 all <> s2
@@ -1329,9 +1559,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertFalse(func.invokeFunc(Boolean, "a", Arrays.asList("a", "a")))
-		assertFalse(func.invokeFunc(Boolean, "a", Arrays.asList("a", "b")))
-		assertTrue(func.invokeFunc(Boolean, "b", Arrays.asList("a", "a")))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList("a", "a"), "a"))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList("a", "b"), "a"))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList("a", "a"), "b"))
 	}
 
 	@Test
@@ -1342,8 +1572,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					s1 string (1..1)
-					s2 string (1..*)
+					s1 string (1..*)
+					s2 string (1..1)
 				output:
 					res boolean (1..1)
 				set res: s1 any <> s2
@@ -1352,9 +1582,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertFalse(func.invokeFunc(Boolean, "a", Arrays.asList("a", "a")))
-		assertTrue(func.invokeFunc(Boolean, "a", Arrays.asList("a", "b")))
-		assertTrue(func.invokeFunc(Boolean, "b", Arrays.asList("a", "a")))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList("a", "a"), "a"))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList("a", "b"), "a"))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList("a", "a"), "b"))
 	}
 
 	@Test
@@ -1365,8 +1595,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					n1 int (1..1)
-					n2 int (1..*)
+					n1 int (1..*)
+					n2 int (1..1)
 				output:
 					res boolean (1..1)
 				set res: n1 all <> n2
@@ -1375,9 +1605,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertFalse(func.invokeFunc(Boolean, 1, Arrays.asList(1, 1)))
-		assertFalse(func.invokeFunc(Boolean, 1, Arrays.asList(1, 2)))
-		assertTrue(func.invokeFunc(Boolean, 2, Arrays.asList(1, 1)))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 1), 1))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 2), 1))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(1, 1), 2))
 	}
 
 	@Test
@@ -1388,8 +1618,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					n1 int (1..1)
-					n2 int (1..*)
+					n1 int (1..*)
+					n2 int (1..1)
 				output:
 					res boolean (1..1)
 				set res: n1 any <> n2
@@ -1398,9 +1628,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertFalse(func.invokeFunc(Boolean, 1, Arrays.asList(1, 1)))
-		assertTrue(func.invokeFunc(Boolean, 1, Arrays.asList(1, 2)))
-		assertTrue(func.invokeFunc(Boolean, 2, Arrays.asList(1, 1)))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 1), 1))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(1, 2), 1))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(1, 1), 2))
 	}
 
 	@Test
@@ -1411,8 +1641,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					n1 int (1..1)
-					n2 int (1..*)
+					n1 int (1..*)
+					n2 int (1..1)
 				output:
 					res boolean (1..1)
 				set res: n1 all > n2
@@ -1421,9 +1651,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		assertTrue(func.invokeFunc(Boolean, 2, Arrays.asList(1, 1)))
-		assertFalse(func.invokeFunc(Boolean, 2, Arrays.asList(1, 2)))
-		assertFalse(func.invokeFunc(Boolean, 1, Arrays.asList(2, 2)))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 1), 2))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 3), 2))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(3, 3), 2))
 	}
 
 	@Test
@@ -1434,8 +1664,8 @@ class FunctionGeneratorTest {
 			
 			func F1:
 				inputs:
-					n1 int (1..1)
-					n2 int (1..*)
+					n1 int (1..*)
+					n2 int (1..1)
 				output:
 					res boolean (1..1)
 				set res: n1 any > n2
@@ -1444,9 +1674,9 @@ class FunctionGeneratorTest {
 		val classes = code.compileToClasses
 
 		val func = classes.createFunc("F1");
-		// assertTrue(func.invokeFunc(Boolean, 2, Arrays.asList(1, 1)))
-		assertTrue(func.invokeFunc(Boolean, 2, Arrays.asList(1, 2)))
-	// assertFalse(func.invokeFunc(Boolean, 1, Arrays.asList(2, 2)))
+		assertFalse(func.invokeFunc(Boolean, Arrays.asList(1, 1), 2))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(1, 3), 2))
+		assertTrue(func.invokeFunc(Boolean, Arrays.asList(3, 3), 2))
 	}
 	
 	@Test
@@ -1774,8 +2004,8 @@ class FunctionGeneratorTest {
 						}
 						
 						protected List<Bar.BarBuilder> assignOutput(List<Bar.BarBuilder> res, Foo foo) {
-							List<Bar.BarBuilder> __addVar0 = toBuilder(distinct(MapperS.of(foo).<Bar>mapC("getBarList", _foo -> _foo.getBarList())).getMulti());
-							res.addAll(__addVar0);
+							List<Bar.BarBuilder> addVar0 = toBuilder(distinct(MapperS.of(foo).<Bar>mapC("getBarList", _foo -> _foo.getBarList())).getMulti());
+							res.addAll(addVar0);
 							
 							return Optional.ofNullable(res)
 								.map(o -> o.stream().map(i -> i.prune()).collect(Collectors.toList()))
@@ -1873,8 +2103,8 @@ class FunctionGeneratorTest {
 						}
 						
 						protected List<Bar.BarBuilder> assignOutput(List<Bar.BarBuilder> res, List<? extends Bar> barList) {
-							List<Bar.BarBuilder> __addVar0 = toBuilder(distinct(MapperC.of(barList)).getMulti());
-							res.addAll(__addVar0);
+							List<Bar.BarBuilder> addVar0 = toBuilder(distinct(MapperC.of(barList)).getMulti());
+							res.addAll(addVar0);
 							
 							return Optional.ofNullable(res)
 								.map(o -> o.stream().map(i -> i.prune()).collect(Collectors.toList()))
@@ -2265,7 +2495,7 @@ class FunctionGeneratorTest {
 						}
 						
 						protected List<String> assignOutput(List<String> result, Boolean test, List<String> t1, List<String> t2) {
-							List<String> __addVar0 = com.rosetta.model.lib.mapper.MapperUtils.fromBuiltInType(() -> {
+							List<String> addVar0 = com.rosetta.model.lib.mapper.MapperUtils.fromBuiltInType(() -> {
 								if (areEqual(MapperS.of(test), MapperS.of(Boolean.valueOf(true)), CardinalityOperator.All).get()) {
 									return MapperC.of(t1);
 								}
@@ -2273,7 +2503,7 @@ class FunctionGeneratorTest {
 									return MapperC.of(t2);
 								}
 							}).getMulti();
-							result.addAll(__addVar0);
+							result.addAll(addVar0);
 							
 							return result;
 						}
@@ -2417,7 +2647,7 @@ class FunctionGeneratorTest {
 						}
 						
 						protected List<BigDecimal> assignOutput(List<BigDecimal> result, Boolean test, List<BigDecimal> t1, List<BigDecimal> t2) {
-							List<BigDecimal> __addVar0 = com.rosetta.model.lib.mapper.MapperUtils.fromBuiltInType(() -> {
+							List<BigDecimal> addVar0 = com.rosetta.model.lib.mapper.MapperUtils.fromBuiltInType(() -> {
 								if (areEqual(MapperS.of(test), MapperS.of(Boolean.valueOf(true)), CardinalityOperator.All).get()) {
 									return MapperC.of(t1);
 								}
@@ -2425,7 +2655,7 @@ class FunctionGeneratorTest {
 									return MapperC.of(t2);
 								}
 							}).getMulti();
-							result.addAll(__addVar0);
+							result.addAll(addVar0);
 							
 							return result;
 						}
@@ -2596,7 +2826,7 @@ class FunctionGeneratorTest {
 						}
 						
 						protected List<Bar.BarBuilder> assignOutput(List<Bar.BarBuilder> result, Boolean test, List<? extends Bar> b1, List<? extends Bar> b2) {
-							List<Bar.BarBuilder> __addVar0 = toBuilder(com.rosetta.model.lib.mapper.MapperUtils.fromDataType(() -> {
+							List<Bar.BarBuilder> addVar0 = toBuilder(com.rosetta.model.lib.mapper.MapperUtils.fromDataType(() -> {
 								if (areEqual(MapperS.of(test), MapperS.of(Boolean.valueOf(true)), CardinalityOperator.All).get()) {
 									return MapperC.of(b1);
 								}
@@ -2604,7 +2834,7 @@ class FunctionGeneratorTest {
 									return MapperC.of(b2);
 								}
 							}).getMulti());
-							result.addAll(__addVar0);
+							result.addAll(addVar0);
 							
 							return Optional.ofNullable(result)
 								.map(o -> o.stream().map(i -> i.prune()).collect(Collectors.toList()))

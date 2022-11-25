@@ -57,6 +57,7 @@ import com.regnosys.rosetta.rosetta.expression.MapOperation
 import com.regnosys.rosetta.rosetta.expression.NamedFunctionReference
 import com.regnosys.rosetta.rosetta.expression.ComparingFunctionalOperation
 import com.regnosys.rosetta.rosetta.expression.SumOperation
+import com.regnosys.rosetta.rosetta.expression.ExtractAllOperation
 
 class RosettaTypeProvider {
 
@@ -241,9 +242,9 @@ class RosettaTypeProvider {
 					ifT
 				} else {
 					val elseT = expression.elsethen.safeRType(cycleTracker)
-					if (ifT instanceof RErrorType) {
+					if (ifT === null || ifT instanceof RErrorType) {
 						elseT
-					} else if (elseT instanceof RErrorType) {
+					} else if (elseT === null || elseT instanceof RErrorType) {
 						ifT
 					} else if (compatibility.isUseableAs(ifT, elseT)) {
 						elseT
@@ -281,7 +282,8 @@ class RosettaTypeProvider {
 			FilterOperation:
 				expression.argument.safeRType(cycleTracker)
 			ReduceOperation,
-			MapOperation:
+			MapOperation,
+			ExtractAllOperation:
 				expression.functionRef.safeRType(cycleTracker)
 			NamedFunctionReference:
 				expression.function.safeRType(cycleTracker)
